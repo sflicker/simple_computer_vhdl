@@ -29,7 +29,7 @@ begin
 				RAM(to_integer(unsigned(addr))) <= data_in;
 			end if;
 		--	report "Memory Writing";
-			-- report "Memory writing from addr: " & unsigned(addr) & " value " & RAM(to_integer(unsigned(addr)));
+			--report "Memory writing from addr: " & unsigned(addr) & " value " & RAM(to_integer(unsigned(addr)));
 			data_out <= RAM(to_integer(unsigned(addr)));
 		end if;
 	end process;

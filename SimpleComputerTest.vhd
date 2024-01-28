@@ -39,8 +39,9 @@ architecture Behavioral of SimpleComputerTest is
 
 	signal clk, reset, enable_write_a, enable_write_b, enable_write_mem  : STD_LOGIC;
 	signal addr : STD_LOGIC_VECTOR(7 downto 0);
-	signal data_bus_out : STD_LOGIC_VECTOR(7 downto 0);
-	signal data_bus_in : STD_LOGIC_VECTOR(7 downto 0);
+	signal memory_out : STD_LOGIC_VECTOR(7 downto 0);
+	signal memory_in : STD_LOGIC_VECTOR(7 downto 0);
+	signal register_direct_data_in : STD_LOGIC_VECTOR(7 downto 0); -- this really should be connected to memory but using this for troubleshooting.
 	signal register_select : STD_LOGIC;
 	signal reg_A_out, reg_B_out : STD_LOGIC_VECTOR(7 downto 0);
 begin
@@ -53,7 +54,7 @@ begin
 			clk => clk, 
 			reset => reset, 
 			enable_write => enable_write_a, 
-			data_in => data_bus_out, 
+			data_in => register_direct_data_in, 
 			data_out => reg_A_out
 		);
 
@@ -65,27 +66,35 @@ begin
 			clk => clk,
 			reset => reset,
 			enable_write => enable_write_b,
-			data_in => data_bus_out,
+			data_in => register_direct_data_in,
 			data_out => reg_B_out
 		);
 
 	dataMemory : entity work.Memory
+		generic Map (
+			ID => "DataMemory"
+		)
 		Port Map (
 			clk => clk,
 			addr => addr,
-			data_in => data_bus_in,
+			data_in => memory_in,
 			enable_write => enable_write_mem,
-			data_out => data_bus_out	
+			data_out => memory_out	
 		);
 
-	registerMux : entity work.Mux
+	registerOutputMux : entity work.Mux
+		generic Map (
+			ID => "RegisterOutputMux"
+		)
 		Port Map (
 			clk => clk,
 			a => reg_A_out,
 			b => reg_B_out,
 			s => register_select,
-			x => data_bus_in
+			x => memory_in
 		);
+
+
 
 	clk_process : process
 	begin
@@ -98,7 +107,7 @@ begin
 	stim_proc : process
 	begin
 		-- initialize
-		Report "Initializing"
+		Report "Initializing";
 		reset <= '1';
 		wait for 1000 ns;
 		reset <= '0';
@@ -107,20 +116,23 @@ begin
 		enable_write_mem <= '0';
 		addr <= (others => '0');
 		addr <= "00000001";
-		data_bus_in <= (others => '0');
-		data_bus_out <= (others => '0');
+--		memory_in <= (others => '0');
+--		memory_out <= (others => '0');
+		register_direct_data_in <= (others => '0');
 		register_select <= '1';
 		
 		wait for 1000 ns;
 
 		Report "setting values to write to A register";
-		data_bus_out <= "00000001";
+--		memory_out <= "00000001";
+		register_direct_data_in <= "00000001";
 		enable_write_a <= '1';
 		enable_write_b <= '0';
 		wait for 1000 ns;
 
 		Report "Settings values to write to B register";
-		data_bus_out <= "00000011";
+--		memory_out <= "00000010";
+		register_direct_data_in <= "00000010";
 		enable_write_a <= '0';
 		enable_write_b <= '1';
 

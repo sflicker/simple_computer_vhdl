@@ -18,8 +18,10 @@ BEGIN
     begin
 	if rising_edge(clk) then
 		if s = '1' then
+			report "Mux Setting Output to input A value " & to_string(a);
 			x <= a;
 		else
+			report "Mux setting output to input B value " & to_string(b);
 			x <= b;
 		end if;
 	end if;
