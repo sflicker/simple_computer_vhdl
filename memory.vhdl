@@ -24,10 +24,12 @@ begin
 	begin
 		if rising_edge(clk) then 
 			if enable_write = '1' then
-				-- Write data to memory
+				--report "Memory Writing from addr: " & integer'image(to_integer(unsigned(addr))) & " value " & std_logic_vector'image(RAM(to_integer(unsigned(addr))));
+
 				RAM(to_integer(unsigned(addr))) <= data_in;
 			end if;
-
+		--	report "Memory Writing";
+			-- report "Memory writing from addr: " & unsigned(addr) & " value " & RAM(to_integer(unsigned(addr)));
 			data_out <= RAM(to_integer(unsigned(addr)));
 		end if;
 	end process;
