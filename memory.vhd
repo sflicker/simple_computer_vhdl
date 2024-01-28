@@ -5,6 +5,9 @@ use IEEE.NUMERIC_STD.ALL;
 --use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity Memory is
+	Generic (
+		ID : string 	-- adding an identifier
+	);
 	Port (
 		clk				: in STD_LOGIC;
 		addr			: in STD_LOGIC_VECTOR(7 downto 0); 	-- 8-bit-address

@@ -41,8 +41,10 @@ architecture Behavioral of SimpleComputerTest is
 	signal addr : STD_LOGIC_VECTOR(7 downto 0);
 	signal memory_out : STD_LOGIC_VECTOR(7 downto 0);
 	signal memory_in : STD_LOGIC_VECTOR(7 downto 0);
-	signal register_direct_data_in : STD_LOGIC_VECTOR(7 downto 0); -- this really should be connected to memory but using this for troubleshooting.
+	signal register_direct_data_in : STD_LOGIC_VECTOR(7 downto 0); 
+	signal register_data_in : STD_LOGIC_VECTOR(7 downto 0);
 	signal register_select : STD_LOGIC;
+	signal register_in_source_select : STD_LOGIC;
 	signal reg_A_out, reg_B_out : STD_LOGIC_VECTOR(7 downto 0);
 begin
 	-- instantiate Registers A and B
@@ -54,7 +56,7 @@ begin
 			clk => clk, 
 			reset => reset, 
 			enable_write => enable_write_a, 
-			data_in => register_direct_data_in, 
+			data_in => register_data_in, 
 			data_out => reg_A_out
 		);
 
@@ -66,7 +68,7 @@ begin
 			clk => clk,
 			reset => reset,
 			enable_write => enable_write_b,
-			data_in => register_direct_data_in,
+			data_in => register_data_in,
 			data_out => reg_B_out
 		);
 
@@ -94,7 +96,17 @@ begin
 			x => memory_in
 		);
 
-
+	registerInputMux : entity work.Mux
+		generic Map (
+			ID => "RegisterInputMux"
+		)
+		Port Map (
+			clk => clk,
+			a => memory_out,
+			b => register_direct_data_in,
+			s  => register_in_source_select,
+			x => register_data_in
+		);
 
 	clk_process : process
 	begin
