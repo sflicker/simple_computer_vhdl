@@ -1,6 +1,8 @@
 #! /bin/bash
 ghdl --clean
 
+ghdl -a --std=08 -fsynopsys Utils.vhd
+ghdl -a --std=08 -fsynopsys Utils-body.vhd
 ghdl -a --std=08 -fsynopsys memory.vhd
 ghdl -a --std=08 -fsynopsys data_register.vhd
 ghdl -a --std=08 -fsynopsys mux.vhd

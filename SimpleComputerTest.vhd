@@ -3,6 +3,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
+--library work;
+--use work.Utils.all;
+
 entity SimpleComputerTest is
 end SimpleComputerTest;
 
@@ -43,7 +46,7 @@ architecture Behavioral of SimpleComputerTest is
 	signal memory_in : STD_LOGIC_VECTOR(7 downto 0);
 	signal register_direct_data_in : STD_LOGIC_VECTOR(7 downto 0); 
 	signal register_data_in : STD_LOGIC_VECTOR(7 downto 0);
-	signal register_select : STD_LOGIC;
+	signal memory_in_register_select : STD_LOGIC;
 	signal register_in_source_select : STD_LOGIC;
 	signal reg_A_out, reg_B_out : STD_LOGIC_VECTOR(7 downto 0);
 begin
@@ -92,7 +95,7 @@ begin
 			clk => clk,
 			a => reg_A_out,
 			b => reg_B_out,
-			s => register_select,
+			s => memory_in_register_select,
 			x => memory_in
 		);
 
@@ -119,9 +122,11 @@ begin
 	stim_proc : process
 	begin
 		-- initialize
-		Report "Initializing";
+		Report "Resetting";
 		reset <= '1';
 		wait for 1000 ns;
+
+		Report "Initializing";
 		reset <= '0';
 		enable_write_a <= '0';
 		enable_write_b <= '0';
@@ -131,39 +136,80 @@ begin
 --		memory_in <= (others => '0');
 --		memory_out <= (others => '0');
 		register_direct_data_in <= (others => '0');
-		register_select <= '1';
+		memory_in_register_select <= '1';
 		
 		wait for 1000 ns;
 
-		Report "setting values to write to A register";
---		memory_out <= "00000001";
+		-- Here is the test description
+		-- write a value directly into Register A
+		-- Write the value in Register A to memory Location 1.
+		-- Write the value of memory location 1 to Register B
+		Report "Starting Test";
+		Report "Preparing to Write Value 01 to Memory register A using direct data in";
 		register_direct_data_in <= "00000001";
+		register_in_source_select <= '0';
 		enable_write_a <= '1';
 		enable_write_b <= '0';
+		Report "Wait for next clock cycle";
+		wait for 1000 ns;
+		Report "Output After clock cycle. register_data_in=" & to_hex_string(register_data_in) & ", enable_write_a=" & to_string(enable_write_a) & ",  reg_A_out=" & to_hex_string(reg_A_out);
+		
+		Report "Wait for next clock cycle";
+		wait for 1000 ns;
+		Report "Output After clock cycle. register_data_in=" & to_hex_string(register_data_in) & ", enable_write_a=" & to_string(enable_write_a) & ",  reg_A_out=" & to_hex_string(reg_A_out);
+
+		Report "Select A register output Location 1";
+		-- write data in regiter A to memory location 1
+		enable_write_a <= '0';
+		memory_in_register_select <= '1';
+		Report "Wait fo next clock cycle";
 		wait for 1000 ns;
 
-		Report "Settings values to write to B register";
---		memory_out <= "00000010";
-		register_direct_data_in <= "00000010";
-		enable_write_a <= '0';
-		enable_write_b <= '1';
-
-		-- write to memory
-		Report "settings values to write Register A to memory location 1";
+		Report "Write to memory location";
 		addr <= "00000001";
 		enable_write_mem <= '1';
-		register_select <= '1';
+		wait for 1000 ns;
+
+		Report "Value in Memory Out Location " & to_hex_string(memory_out);
+
+		Report "Preparing to Write Value in Memory Location 1 to Register B";
+		-- write data in memory location 1 to Register B
+		enable_write_mem <= '0';
+		register_in_source_select <= '1';
+		Report "Wait for next clock cycle";
+		wait for 1000 ns;
+
+		enable_write_b <= '1';
+		wait for 1000 ns;
 
 		wait for 1000 ns;
 
-		-- 
-		Report "settings values to write Register B to memory Location 2";
-		register_select <= '0';
-		addr <= "00000010";
 		wait for 1000 ns;
+		Report "Output of Register B after clock - " & to_hex_string(reg_B_out);
+		enable_write_b <= '0';
 
-		wait for 5000 ns;
+-- 		Report "Settings values to write to B register";
+-- --		memory_out <= "00000010";
+-- 		register_direct_data_in <= "00000010";
+-- 		enable_write_a <= '0';
+-- 		enable_write_b <= '1';
 
+-- 		-- write to memory
+-- 		Report "settings values to write Register A to memory location 1";
+-- 		addr <= "00000001";
+-- 		enable_write_mem <= '1';
+-- 		memory_in_register_select <= '1';
+
+-- 		wait for 1000 ns;
+
+-- 		-- 
+-- 		Report "settings values to write Register B to memory Location 2";
+-- 		memory_in_register_select <= '0';
+-- 		addr <= "00000010";
+-- 		wait for 1000 ns;
+
+		wait for 10000 ns;
+		report "Finished";
 	end process;
 
 end Behavioral;

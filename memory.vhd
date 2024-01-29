@@ -4,6 +4,9 @@ use IEEE.NUMERIC_STD.ALL;
 --use IEEE.STD_LOGIC_ARITH.ALL;
 --use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
+library work;
+use work.Utils.all;
+
 entity Memory is
 	Generic (
 		ID : string 	-- adding an identifier
@@ -27,6 +30,7 @@ begin
 	begin
 		if rising_edge(clk) then 
 			if enable_write = '1' then
+				--report "Memory Writing to addr: " & to_hex_string(addr);
 				--report "Memory Writing from addr: " & integer'image(to_integer(unsigned(addr))) & " value " & std_logic_vector'image(RAM(to_integer(unsigned(addr))));
 
 				RAM(to_integer(unsigned(addr))) <= data_in;
